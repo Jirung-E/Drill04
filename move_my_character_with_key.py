@@ -24,6 +24,7 @@ class IdleState(State):
     def __init__(self, img):
         super().__init__(img)
         self.frame_delay = 0.1
+        self.direction = -1
         self._clip_points: List[Point] = [Point(229, 306), Point(255, 307), Point(284, 308), 
                                           Point(316, 308), Point(344, 309), Point(374, 310),
                                           Point(404, 309)]
@@ -44,16 +45,16 @@ class IdleState(State):
             )
         else:
             self.image.clip_composite_draw(
-                self._clip_start_point.x + self.frame * self._clip_size_width, 
-                self._clip_start_point.y + self.frame * self._clip_size_height, 
-                self._clip_size_width, 
-                self._clip_size_height, 
-                0, 
-                'h', 
+                self._clip_points[self.frame].x, 
+                self._clip_points[self.frame].y, 
+                self._clip_width[self.frame], 
+                self._clip_height[self.frame], 
+                0,
+                'h',
                 x, 
-                y, 
-                self._clip_size_width * self.size, 
-                self._clip_size_height * self.size
+                y,
+                self._clip_width[self.frame] * self.size, 
+                self._clip_height[self.frame] * self.size
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
 
@@ -80,6 +81,9 @@ background_img = load_image('TUK_GROUND.png')
 character = Character(character_img)
 
 
+def handle_events():
+    pass
+
 while True:
     clear_canvas()
 
@@ -87,6 +91,7 @@ while True:
     character.draw()
 
     update_canvas()
+    handle_events()
 
     delay(character.state.frame_delay)
 
