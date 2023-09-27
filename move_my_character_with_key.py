@@ -8,6 +8,17 @@ class Point:
         self.x = x
         self.y = y
 
+    def __add__(self, rhs):
+        return Point(self.x + rhs.x, self.y + rhs.y)
+
+class Vector:   # 이름만 구분
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __mul__(self, rhs):
+        return Vector(self.x * rhs, self.y * rhs)
+
 
 class State:
     def __init__(self):
@@ -28,7 +39,7 @@ class IdleState(State):
         self._clip_height = [47, 47, 47, 47, 46, 46, 47]
 
     def animation(self, image: Image, x, y, flip, size):
-        if flip >= 0:
+        if flip == False:
             image.clip_draw(
                 self._clip_points[self.frame].x, 
                 self._clip_points[self.frame].y, 
@@ -58,13 +69,17 @@ class IdleState(State):
 class Character:
     def __init__(self, image: Image):
         self.image: Image = image
-        self.x, self.y = BACKGROUND_X, BACKGROUND_Y
+        self.position: Point = Point(BACKGROUND_X, BACKGROUND_Y)
+        self.direction: Vector = Vector(0, 0)
         self.flip = False
         self.size = 3
         self.state: State = IdleState()
 
     def draw(self):
-        self.state.animation(self.image, self.x, self.y, self.flip, self.size)
+        self.state.animation(self.image, self.position.x, self.position.y, self.flip, self.size)
+
+    def update(self):
+        self.position += self.direction * 5
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 1024
@@ -92,8 +107,23 @@ def handle_events():
                 repeat = False
             elif event.key == SDLK_LEFT:
                 character.flip = True
+                character.direction.x -= 1
             elif event.key == SDLK_RIGHT:
                 character.flip = False
+                character.direction.x += 1
+            elif event.key == SDLK_UP:
+                character.direction.y += 1
+            elif event.key == SDLK_DOWN:
+                character.direction.y -= 1
+        elif event.type == SDL_KEYUP:
+            if event.key == SDLK_LEFT:
+                character.direction.x += 1
+            elif event.key == SDLK_RIGHT:
+                character.direction.x -= 1
+            elif event.key == SDLK_UP:
+                character.direction.y -= 1
+            elif event.key == SDLK_DOWN:
+                character.direction.y += 1
 
 
 while repeat:
@@ -101,9 +131,10 @@ while repeat:
 
     background_img.draw(BACKGROUND_X, BACKGROUND_Y)
     character.draw()
+    character.update()
 
-    update_canvas()
     handle_events()
+    update_canvas()
 
     delay(character.state.frame_delay)
 
