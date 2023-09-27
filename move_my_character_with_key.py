@@ -36,7 +36,7 @@ class IdleState(State):
                                           Point(316, 308), Point(344, 309), Point(374, 310),
                                           Point(404, 309)]
         self._clip_width = [25, 26, 26, 25, 24, 25, 25]
-        self._clip_height = [47, 47, 47, 47, 46, 46, 47]
+        self._clip_height = 48
 
     def animation(self, image: Image, x, y, flip, size):
         if flip == False:
@@ -44,24 +44,24 @@ class IdleState(State):
                 self._clip_points[self.frame].x, 
                 self._clip_points[self.frame].y, 
                 self._clip_width[self.frame], 
-                self._clip_height[self.frame], 
+                self._clip_height, 
                 x, 
                 y, 
                 self._clip_width[self.frame] * size, 
-                self._clip_height[self.frame] * size
+                self._clip_height * size
             )
         else:
             image.clip_composite_draw(
                 self._clip_points[self.frame].x, 
                 self._clip_points[self.frame].y, 
                 self._clip_width[self.frame], 
-                self._clip_height[self.frame], 
+                self._clip_height, 
                 0,
                 'h',
                 x, 
                 y,
                 self._clip_width[self.frame] * size, 
-                self._clip_height[self.frame] * size
+                self._clip_height * size
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
 
@@ -69,10 +69,13 @@ class IdleState(State):
 class RunState(State):
     def __init__(self):
         super().__init__()
-        self.frame_delay = 0.05
-        self._clip_points: List[Point] = [Point(165, 367), Point(197, 367), Point(241, 367),]
-        self._clip_width = [31, 38, 28]
-        self._clip_height = [41, 44, 44]
+        self.frame_delay = 0.1
+        self._clip_points: List[Point] = [Point(241, 364), Point(273, 364), Point(299, 364),
+                                          Point(324, 364), Point(356, 364), Point(392, 364),
+                                          Point(427, 364), Point(453, 364), Point(479, 364),
+                                          Point(509, 362)]
+        self._clip_width = [28, 20, 23, 25, 31, 27, 18, 20, 27, 32]
+        self._clip_height = 48
 
     def animation(self, image: Image, x, y, flip, size):
         if flip == False:
@@ -80,24 +83,24 @@ class RunState(State):
                 self._clip_points[self.frame].x, 
                 self._clip_points[self.frame].y, 
                 self._clip_width[self.frame], 
-                self._clip_height[self.frame], 
+                self._clip_height, 
                 x, 
                 y, 
                 self._clip_width[self.frame] * size, 
-                self._clip_height[self.frame] * size
+                self._clip_height * size
             )
         else:
             image.clip_composite_draw(
                 self._clip_points[self.frame].x, 
                 self._clip_points[self.frame].y, 
                 self._clip_width[self.frame], 
-                self._clip_height[self.frame], 
+                self._clip_height, 
                 0,
                 'h',
                 x, 
                 y,
                 self._clip_width[self.frame] * size, 
-                self._clip_height[self.frame] * size
+                self._clip_height * size
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
 
@@ -108,14 +111,15 @@ class Character:
         self.position: Point = Point(BACKGROUND_X, BACKGROUND_Y)
         self.direction: Vector = Vector(0, 0)
         self.flip = False
-        self.size = 3
-        self.state: State = IdleState()
+        self.size = 10
+        # self.state: State = IdleState()
+        self.state: State = RunState()
 
     def draw(self):
         self.state.animation(self.image, self.position.x, self.position.y, self.flip, self.size)
 
     def update(self):
-        self.position += self.direction * 10
+        self.position += self.direction * 20
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 1024
@@ -169,7 +173,7 @@ def handle_events():
 while repeat:
     clear_canvas()
 
-    background_img.draw(BACKGROUND_X, BACKGROUND_Y)
+    # background_img.draw(BACKGROUND_X, BACKGROUND_Y)
     character.draw()
     character.update()
 
