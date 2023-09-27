@@ -11,7 +11,7 @@ class Point:
     def __add__(self, rhs):
         return Point(self.x + rhs.x, self.y + rhs.y)
 
-class Vector:   # 이름만 구분
+class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -66,6 +66,42 @@ class IdleState(State):
         self.frame = (self.frame + 1) % len(self._clip_points)
 
 
+class RunState(State):
+    def __init__(self):
+        super().__init__()
+        self.frame_delay = 0.05
+        self._clip_points: List[Point] = [Point(165, 367), Point(197, 367), Point(241, 367),]
+        self._clip_width = [31, 38, 28]
+        self._clip_height = [41, 44, 44]
+
+    def animation(self, image: Image, x, y, flip, size):
+        if flip == False:
+            image.clip_draw(
+                self._clip_points[self.frame].x, 
+                self._clip_points[self.frame].y, 
+                self._clip_width[self.frame], 
+                self._clip_height[self.frame], 
+                x, 
+                y, 
+                self._clip_width[self.frame] * size, 
+                self._clip_height[self.frame] * size
+            )
+        else:
+            image.clip_composite_draw(
+                self._clip_points[self.frame].x, 
+                self._clip_points[self.frame].y, 
+                self._clip_width[self.frame], 
+                self._clip_height[self.frame], 
+                0,
+                'h',
+                x, 
+                y,
+                self._clip_width[self.frame] * size, 
+                self._clip_height[self.frame] * size
+            )
+        self.frame = (self.frame + 1) % len(self._clip_points)
+
+
 class Character:
     def __init__(self, image: Image):
         self.image: Image = image
@@ -73,13 +109,14 @@ class Character:
         self.direction: Vector = Vector(0, 0)
         self.flip = False
         self.size = 3
-        self.state: State = IdleState()
+        self.state: State = RunState()
+        # self.state: State = IdleState()
 
     def draw(self):
         self.state.animation(self.image, self.position.x, self.position.y, self.flip, self.size)
 
     def update(self):
-        self.position += self.direction * 5
+        self.position += self.direction * 10
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 1024
@@ -137,7 +174,6 @@ while repeat:
     update_canvas()
 
     delay(character.state.frame_delay)
-
 
 
 close_canvas()
