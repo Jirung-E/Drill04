@@ -14,7 +14,7 @@ class State:
         self.frame_delay = 0.05
         self.frame = 0
         
-    def animation(self, image: Image, x, y, direction, size=1):
+    def animation(self, image: Image, x, y, flip=False, size=1):
         pass
 
 class IdleState(State):
@@ -27,8 +27,8 @@ class IdleState(State):
         self._clip_width = [25, 26, 26, 25, 24, 25, 25]
         self._clip_height = [47, 47, 47, 47, 46, 46, 47]
 
-    def animation(self, image: Image, x, y, direction, size):
-        if direction >= 0:
+    def animation(self, image: Image, x, y, flip, size):
+        if flip >= 0:
             image.clip_draw(
                 self._clip_points[self.frame].x, 
                 self._clip_points[self.frame].y, 
@@ -59,12 +59,12 @@ class Character:
     def __init__(self, image: Image):
         self.image: Image = image
         self.x, self.y = BACKGROUND_X, BACKGROUND_Y
-        self.direction = 0
+        self.flip = False
         self.size = 3
         self.state: State = IdleState()
 
     def draw(self):
-        self.state.animation(self.image, self.x, self.y, self.direction, self.size)
+        self.state.animation(self.image, self.x, self.y, self.flip, self.size)
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 1024
@@ -91,9 +91,9 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 repeat = False
             elif event.key == SDLK_LEFT:
-                character.direction = -1
+                character.flip = True
             elif event.key == SDLK_RIGHT:
-                character.direction = 1
+                character.flip = False
 
 
 while repeat:
