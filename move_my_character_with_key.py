@@ -109,8 +109,7 @@ class Character:
         self.direction: Vector = Vector(0, 0)
         self.flip = False
         self.size = 3
-        self.state: State = RunState()
-        # self.state: State = IdleState()
+        self.state: State = IdleState()
 
     def draw(self):
         self.state.animation(self.image, self.position.x, self.position.y, self.flip, self.size)
@@ -140,6 +139,8 @@ def handle_events():
         if event.type == SDL_QUIT:
             repeat = False
         elif event.type == SDL_KEYDOWN:
+            if character.direction.x == 0 and character.direction.y == 0:
+                character.state = RunState()
             if event.key == SDLK_ESCAPE:
                 repeat = False
             elif event.key == SDLK_LEFT:
@@ -161,6 +162,8 @@ def handle_events():
                 character.direction.y -= 1
             elif event.key == SDLK_DOWN:
                 character.direction.y += 1
+            if character.direction.x == 0 and character.direction.y == 0:
+                character.state = IdleState()
 
 
 while repeat:
