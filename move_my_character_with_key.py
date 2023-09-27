@@ -25,9 +25,10 @@ class IdleState(State):
         super().__init__(img)
         self.frame_delay = 0.1
         self._clip_points: List[Point] = [Point(229, 306), Point(255, 307), Point(284, 308), 
-                                          Point(316, 308), Point(344, 309), Point(374, 309),]
-        self._clip_width = [25, 26, 26, 25, 24, 24]
-        self._clip_height = [47, 47, 47, 47, 46, 46]
+                                          Point(316, 308), Point(344, 309), Point(374, 310),
+                                          Point(404, 309)]
+        self._clip_width = [25, 26, 26, 25, 24, 25, 25]
+        self._clip_height = [47, 47, 47, 47, 46, 46, 47]
 
     def animation(self, x, y):
         if self.direction >= 0:
