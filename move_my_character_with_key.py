@@ -22,30 +22,14 @@ class Vector:
 
 class State:
     def __init__(self, character):
+        self.character = character
         self.frame_delay = 0.05
         self.frame = 0
-        self.character = character
+        self._clip_points: List[Point]
+        self._clip_width: List[int]
+        self._clip_height: int
         
     def animation(self, image: Image, x, y, flip=False, size=1):
-        pass
-
-    def run(self):
-        pass
-
-    def idle(self):
-        pass
-
-class IdleState(State):
-    def __init__(self, character):
-        super().__init__(character)
-        self.frame_delay = 0.1
-        self._clip_points: List[Point] = [Point(229, 306), Point(255, 307), Point(284, 308), 
-                                          Point(316, 308), Point(344, 309), Point(374, 310),
-                                          Point(404, 309)]
-        self._clip_width = [25, 26, 26, 25, 24, 25, 25]
-        self._clip_height = 48
-
-    def animation(self, image: Image, x, y, flip, size):
         if flip == False:
             image.clip_draw(
                 self._clip_points[self.frame].x, 
@@ -71,6 +55,22 @@ class IdleState(State):
                 self._clip_height * size
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
+
+    def run(self):
+        pass
+
+    def idle(self):
+        pass
+
+class IdleState(State):
+    def __init__(self, character):
+        super().__init__(character)
+        self.frame_delay = 0.1
+        self._clip_points: List[Point] = [Point(229, 306), Point(255, 307), Point(284, 308), 
+                                          Point(316, 308), Point(344, 309), Point(374, 310),
+                                          Point(404, 309)]
+        self._clip_width = [25, 26, 26, 25, 24, 25, 25]
+        self._clip_height = 48
 
     def run(self):
         self.character.state = self.character.getRunState()
@@ -89,33 +89,6 @@ class RunState(State):
                                           Point(509, 362)]
         self._clip_width = [28, 20, 23, 25, 31, 27, 18, 20, 27, 32]
         self._clip_height = 48
-
-    def animation(self, image: Image, x, y, flip, size):
-        if flip == False:
-            image.clip_draw(
-                self._clip_points[self.frame].x, 
-                self._clip_points[self.frame].y, 
-                self._clip_width[self.frame], 
-                self._clip_height, 
-                x, 
-                y, 
-                self._clip_width[self.frame] * size, 
-                self._clip_height * size
-            )
-        else:
-            image.clip_composite_draw(
-                self._clip_points[self.frame].x, 
-                self._clip_points[self.frame].y, 
-                self._clip_width[self.frame], 
-                self._clip_height, 
-                0,
-                'h',
-                x, 
-                y,
-                self._clip_width[self.frame] * size, 
-                self._clip_height * size
-            )
-        self.frame = (self.frame + 1) % len(self._clip_points)
 
     def run(self):
         if self.character.direction.x > 0:
