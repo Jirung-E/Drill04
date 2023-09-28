@@ -116,6 +116,14 @@ class Character:
 
     def update(self):
         self.position += self.direction * 20
+        if self.position.x < 30:
+            self.position.x = 30
+        elif self.position.x > WINDOW_WIDTH - 30:
+            self.position.x = WINDOW_WIDTH - 30
+        if self.position.y < 70:
+            self.position.y = 70
+        elif self.position.y > WINDOW_HEIGHT - 70:
+            self.position.y = WINDOW_HEIGHT - 70
 
     def getIdleState(self):
         return self._idle_state
