@@ -118,7 +118,10 @@ class RunState(State):
         self.frame = (self.frame + 1) % len(self._clip_points)
 
     def run(self):
-        pass
+        if self.character.direction.x > 0:
+            self.character.flip = False
+        elif self.character.direction.x < 0:
+            self.character.flip = True
 
     def idle(self):
         self.character.state = self.character.getIdleState()
@@ -169,8 +172,6 @@ def handle_events():
         if event.type == SDL_QUIT:
             repeat = False
         elif event.type == SDL_KEYDOWN:
-            if character.direction.x == 0 and character.direction.y == 0:
-                character.state.run()
             if event.key == SDLK_ESCAPE:
                 repeat = False
             elif event.key == SDLK_LEFT:
@@ -192,8 +193,11 @@ def handle_events():
                 character.direction.y -= 1
             elif event.key == SDLK_DOWN:
                 character.direction.y += 1
-            if character.direction.x == 0 and character.direction.y == 0:
-                character.state.idle()
+
+    if character.direction.x == 0 and character.direction.y == 0:
+        character.state.idle()
+    else:
+        character.state.run()
 
 
 while repeat:
