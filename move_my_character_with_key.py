@@ -21,16 +21,23 @@ class Vector:
 
 
 class State:
-    def __init__(self):
+    def __init__(self, character):
         self.frame_delay = 0.05
         self.frame = 0
+        self.character = character
         
     def animation(self, image: Image, x, y, flip=False, size=1):
         pass
 
+    def run(self):
+        pass
+
+    def idle(self):
+        pass
+
 class IdleState(State):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, character):
+        super().__init__(character)
         self.frame_delay = 0.1
         self._clip_points: List[Point] = [Point(229, 306), Point(255, 307), Point(284, 308), 
                                           Point(316, 308), Point(344, 309), Point(374, 310),
@@ -65,11 +72,17 @@ class IdleState(State):
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
 
+    def run(self):
+        self.character.state = self.character.getRunState()
+
+    def idle(self):
+        pass
+
 
 class RunState(State):
-    def __init__(self):
-        super().__init__()
-        self.frame_delay = 0.1
+    def __init__(self, character):
+        super().__init__(character)
+        self.frame_delay = 0.05
         self._clip_points: List[Point] = [Point(241, 364), Point(273, 364), Point(299, 364),
                                           Point(324, 364), Point(356, 364), Point(392, 364),
                                           Point(427, 364), Point(453, 364), Point(479, 364),
@@ -104,6 +117,12 @@ class RunState(State):
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
 
+    def run(self):
+        pass
+
+    def idle(self):
+        self.character.state = self.character.getIdleState()
+
 
 class Character:
     def __init__(self, image: Image):
@@ -111,15 +130,22 @@ class Character:
         self.position: Point = Point(BACKGROUND_X, BACKGROUND_Y)
         self.direction: Vector = Vector(0, 0)
         self.flip = False
-        self.size = 10
-        # self.state: State = IdleState()
-        self.state: State = RunState()
+        self.size = 3
+        self._idle_state = IdleState(self)
+        self._run_state = RunState(self)
+        self.state: State = self._idle_state
 
     def draw(self):
         self.state.animation(self.image, self.position.x, self.position.y, self.flip, self.size)
 
     def update(self):
         self.position += self.direction * 20
+
+    def getIdleState(self):
+        return self._idle_state
+    
+    def getRunState(self):
+        return self._run_state
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 1024
@@ -144,7 +170,7 @@ def handle_events():
             repeat = False
         elif event.type == SDL_KEYDOWN:
             if character.direction.x == 0 and character.direction.y == 0:
-                character.state = RunState()
+                character.state.run()
             if event.key == SDLK_ESCAPE:
                 repeat = False
             elif event.key == SDLK_LEFT:
@@ -167,13 +193,13 @@ def handle_events():
             elif event.key == SDLK_DOWN:
                 character.direction.y += 1
             if character.direction.x == 0 and character.direction.y == 0:
-                character.state = IdleState()
+                character.state.idle()
 
 
 while repeat:
     clear_canvas()
 
-    # background_img.draw(BACKGROUND_X, BACKGROUND_Y)
+    background_img.draw(BACKGROUND_X, BACKGROUND_Y)
     character.draw()
     character.update()
 
