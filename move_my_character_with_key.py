@@ -1,6 +1,7 @@
 from pico2d import *
 
 from typing import List
+from abc import ABC, abstractmethod
 
 
 class Point:
@@ -20,7 +21,7 @@ class Vector:
         return Vector(self.x * rhs, self.y * rhs)
 
 
-class State:
+class State(ABC):
     def __init__(self, character):
         self.character = character
         self.frame_delay = 0.05
@@ -56,9 +57,11 @@ class State:
             )
         self.frame = (self.frame + 1) % len(self._clip_points)
 
+    @abstractmethod
     def run(self):
         pass
 
+    @abstractmethod
     def idle(self):
         pass
 
@@ -77,7 +80,6 @@ class IdleState(State):
 
     def idle(self):
         pass
-
 
 class RunState(State):
     def __init__(self, character):
